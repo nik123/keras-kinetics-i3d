@@ -1,0 +1,19 @@
+# Environments #
+################
+.env
+.venv
+env/
+venv/
+
+# Python: byte-compiled / optimized / DLL files
+__pycache__
+*.py[cod]
+*$py.class
+
+# Vim #
+#######
+# Swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-v][a-z]
+[._]sw[a-p]

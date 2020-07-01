@@ -31,7 +31,7 @@ def main(args):
     if args.eval_type in ['rgb', 'joint']:
         if args.no_imagenet_pretrained:
             # build model for RGB data
-            # and load pretrained weights (trained on kinetics dataset only) 
+            # and load pretrained weights (trained on kinetics dataset only)
             rgb_model = Inception_Inflated3d(
                 include_top=True,
                 weights='rgb_kinetics_only',
@@ -48,7 +48,7 @@ def main(args):
 
         # load RGB sample (just one example)
         rgb_sample = np.load(SAMPLE_DATA_PATH['rgb'])
-        
+
         # make prediction
         rgb_logits = rgb_model.predict(rgb_sample)
 
@@ -74,7 +74,7 @@ def main(args):
 
         # load flow sample (just one example)
         flow_sample = np.load(SAMPLE_DATA_PATH['flow'])
-        
+
         # make prediction
         flow_logits = flow_model.predict(flow_sample)
 
@@ -104,8 +104,8 @@ def main(args):
 if __name__ == '__main__':
     # parse arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument('--eval-type', 
-        help='specify model type. 1 stream (rgb or flow) or 2 stream (joint = rgb and flow).', 
+    parser.add_argument('--eval-type',
+        help='specify model type. 1 stream (rgb or flow) or 2 stream (joint = rgb and flow).',
         type=str, choices=['rgb', 'flow', 'joint'], default='joint')
 
     parser.add_argument('--no-imagenet-pretrained',

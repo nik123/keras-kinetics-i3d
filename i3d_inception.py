@@ -1,37 +1,38 @@
 """Inception-v1 Inflated 3D ConvNet used for Kinetics CVPR paper.
- 
+
 The model is introduced in:
- 
+
 Quo Vadis, Action Recognition? A New Model and the Kinetics Dataset
 Joao Carreira, Andrew Zisserman
 https://arxiv.org/abs/1705.07750v1
 """
-        
+
 from __future__ import print_function
 from __future__ import absolute_import
+
+import os
 
 import warnings
 
 import numpy as np
 
-from keras.models import Model
-from keras import layers
-from keras.layers import Activation
-from keras.layers import Dense
-from keras.layers import Input
-from keras.layers import BatchNormalization
-from keras.layers import Conv3D
-from keras.layers import MaxPooling3D
-from keras.layers import AveragePooling3D
-from keras.layers import Dropout
-from keras.layers import Reshape
-from keras.layers import Lambda
-from keras.layers import GlobalAveragePooling3D
+from tensorflow.python.keras.models import Model
+from tensorflow.python.keras import layers
+from tensorflow.python.keras.layers import Activation
+from tensorflow.python.keras.layers import Dense
+from tensorflow.python.keras.layers import Input
+from tensorflow.python.keras.layers import BatchNormalization
+from tensorflow.python.keras.layers import Conv3D
+from tensorflow.python.keras.layers import MaxPooling3D
+from tensorflow.python.keras.layers import AveragePooling3D
+from tensorflow.python.keras.layers import Dropout
+from tensorflow.python.keras.layers import Reshape
+from tensorflow.python.keras.layers import Lambda
+from tensorflow.python.keras.layers import GlobalAveragePooling3D
 
-from keras.engine.topology import get_source_inputs
-from keras.utils import layer_utils
-from keras.utils.data_utils import get_file
-from keras import backend as K
+from tensorflow.keras.utils import convert_all_kernels_in_model
+from tensorflow.keras.utils import get_file
+from tensorflow.keras import backend as K
 
 WEIGHTS_NAME = ['rgb_kinetics_only', 'flow_kinetics_only', 'rgb_imagenet_and_kinetics', 'flow_imagenet_and_kinetics']
 
@@ -62,7 +63,6 @@ def _obtain_input_shape(input_shape,
                         weights=None):
     """Internal utility to compute/validate the model's input shape.
     (Adapted from `keras/applications/imagenet_utils.py`)
-
     # Arguments
         input_shape: either None (will return the default network input shape),
             or a user-provided shape to be validated.
@@ -78,10 +78,8 @@ def _obtain_input_shape(input_shape,
             or 'imagenet_and_kinetics' (pre-training on ImageNet and Kinetics datasets).
             If weights='kinetics_only' or weights=='imagenet_and_kinetics' then
             input channels must be equal to 3.
-
     # Returns
         An integer shape tuple (may include None entries).
-
     # Raises
         ValueError: in case of invalid argument values.
     """
@@ -181,7 +179,6 @@ def conv3d_bn(x,
               use_bn = True,
               name=None):
     """Utility function to apply conv3d + BN.
-
     # Arguments
         x: input tensor.
         filters: filters in `Conv3D`.
@@ -190,13 +187,12 @@ def conv3d_bn(x,
         num_col: width of the convolution kernel.
         padding: padding mode in `Conv3D`.
         strides: strides in `Conv3D`.
-        use_bias: use bias or not  
+        use_bias: use bias or not
         use_activation_fn: use an activation function or not.
         use_bn: use batch normalization or not.
         name: name of the ops; will become `name + '_conv'`
             for the convolution and `name + '_bn'` for the
             batch norm layer.
-
     # Returns
         Output tensor after applying `Conv3D` and `BatchNormalization`.
     """
@@ -235,7 +231,6 @@ def Inception_Inflated3d(include_top=True,
                 endpoint_logit=True,
                 classes=400):
     """Instantiates the Inflated 3D Inception v1 architecture.
-
     Optionally loads weights pre-trained
     on Kinetics. Note that when using TensorFlow,
     for best performance you should set
@@ -246,9 +241,8 @@ def Inception_Inflated3d(include_top=True,
     convention used by the model is the one
     specified in your Keras config file.
     Note that the default input frame(image) size for this model is 224x224.
-
     # Arguments
-        include_top: whether to include the the classification 
+        include_top: whether to include the the classification
             layer at the top of the network.
         weights: one of `None` (random initialization)
             or 'kinetics_only' (pre-training on Kinetics dataset only).
@@ -265,13 +259,13 @@ def Inception_Inflated3d(include_top=True,
             Also, Width and height should be no smaller than 32.
             E.g. `(64, 150, 150, 3)` would be one valid value.
         dropout_prob: optional, dropout probability applied in dropout layer
-            after global average pooling layer. 
+            after global average pooling layer.
             0.0 means no dropout is applied, 1.0 means dropout is applied to all features.
             Note: Since Dropout is applied just before the classification
             layer, it is only useful when `include_top` is set to True.
         endpoint_logit: (boolean) optional. If True, the model's forward pass
             will end at producing logits. Otherwise, softmax is applied after producing
-            the logits to produce the class probabilities prediction. Setting this parameter 
+            the logits to produce the class probabilities prediction. Setting this parameter
             to True is particularly useful when you want to combine results of rgb model
             and optical flow model.
             - `True` end model forward pass at logit output
@@ -280,18 +274,16 @@ def Inception_Inflated3d(include_top=True,
         classes: optional number of classes to classify images
             into, only to be specified if `include_top` is True, and
             if no `weights` argument is specified.
-
     # Returns
         A Keras model instance.
-
     # Raises
         ValueError: in case of invalid argument for `weights`,
             or invalid input shape.
     """
     if not (weights in WEIGHTS_NAME or weights is None or os.path.exists(weights)):
         raise ValueError('The `weights` argument should be either '
-                         '`None` (random initialization) or %s' % 
-                         str(WEIGHTS_NAME) + ' ' 
+                         '`None` (random initialization) or %s' %
+                         str(WEIGHTS_NAME) + ' '
                          'or a valid path to a file containing `weights` values')
 
     if weights in WEIGHTS_NAME and include_top and classes != 400:
@@ -301,8 +293,8 @@ def Inception_Inflated3d(include_top=True,
     # Determine proper input shape
     input_shape = _obtain_input_shape(
         input_shape,
-        default_frame_size=224, 
-        min_frame_size=32, 
+        default_frame_size=224,
+        min_frame_size=32,
         default_num_frames=64,
         min_num_frames=8,
         data_format=K.image_data_format(),
@@ -499,9 +491,9 @@ def Inception_Inflated3d(include_top=True,
         x = AveragePooling3D((2, 7, 7), strides=(1, 1, 1), padding='valid', name='global_avg_pool')(x)
         x = Dropout(dropout_prob)(x)
 
-        x = conv3d_bn(x, classes, 1, 1, 1, padding='same', 
+        x = conv3d_bn(x, classes, 1, 1, 1, padding='same',
                 use_bias=True, use_activation_fn=False, use_bn=False, name='Conv3d_6a_1x1')
- 
+
         num_frames_remaining = int(x.shape[1])
         x = Reshape((num_frames_remaining, classes))(x)
 
@@ -560,7 +552,7 @@ def Inception_Inflated3d(include_top=True,
         model.load_weights(downloaded_weights_path)
 
         if K.backend() == 'theano':
-            layer_utils.convert_all_kernels_in_model(model)
+            convert_all_kernels_in_model(model)
 
         if K.image_data_format() == 'channels_first' and K.backend() == 'tensorflow':
             warnings.warn('You are using the TensorFlow backend, yet you '
